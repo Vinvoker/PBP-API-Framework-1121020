@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -10,7 +9,7 @@ import (
 )
 
 func generateToken(c *gin.Context, id int, name string, userType int) {
-	jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+	jwtSecretKey := "mysecretkey123"
 
 	expiryTime := time.Now().Add(time.Hour * 24)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &CustomClaims{
@@ -48,7 +47,7 @@ func AuthMiddleware() gin.HandlerFunc {
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
-			jwtSecretKey := os.Getenv("JWT_SECRET_KEY")
+			jwtSecretKey := "mysecretkey123"
 
 			parsedToken, err := jwt.ParseWithClaims(cookie, &CustomClaims{}, func(accessToken *jwt.Token) (interface{}, error) {
 				return []byte(jwtSecretKey), nil
