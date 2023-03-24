@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -87,20 +88,29 @@ func CreateUser(c *gin.Context) {
 	db := connect()
 	defer db.Close()
 
-	result, err := db.Exec("INSERT INTO users (username, useremail, usercountry, usertype, userpassword) VALUES (?, ?, ?, ?, ?)", user.UserName, user.UserEmail, user.UserCountry, user.UserType, user.userPassword)
+	username := c.Param("username")
+	password := c.Param("password")
+
+	query := fmt.Sprintf("SELECT * FROM users WHERE username='%s' AND password='%s'", username, password)
+	_, err := db.Query(query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		panic(err.Error())
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	// result, err := db.Exec("INSERT INTO users (username, useremail, usercountry, usertype, userpassword) VALUES (?, ?, ?, ?, ?)", user.UserName, user.UserEmail, user.UserCountry, user.UserType, user.userPassword)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
 
-	user.UserId = int(id)
-	c.JSON(http.StatusOK, user)
+	// id, err := result.LastInsertId()
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
+
+	// user.UserId = int(id)
+	// c.JSON(http.StatusOK, user)
 }
 
 func UpdateUser(c *gin.Context) {
